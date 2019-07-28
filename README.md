@@ -23,6 +23,18 @@ bundle install
 
 ## Usage
 
+Run the program by
+
 ```
 ruby main.rb
 ```
+
+This will append data apps to a file called `apps.csv`
+
+
+## Notes
+
+ * The `apps.csv` file is always appended. Be sure to delete the file before running the app again.
+
+ * The program tries to not have duplicate data fetched (or appended to the file). However, in some rare circumstances,
+ duplicate rows may be present. This is done in the interest of speed and not to miss out on any data.

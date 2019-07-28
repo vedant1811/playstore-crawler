@@ -23,9 +23,14 @@ class AppJob
     installs = installs(html)
     dev_email = dev_email(links)
 
-    puts "AppJob process: #{@url}, #{@jobs.size}: #{app_name}, #{installs}, #{dev_email}"
+    # puts "AppJob process: #{@url}, #{@jobs.size}: #{app_name}, #{installs}, #{dev_email}"
+
+    open('apps.csv', 'a') do |f|
+      f.puts "\"#{app_name}\", \"#{installs}\", #{dev_email}, #{@url}"
+    end
 
     @processed_app_urls << @url
+    print '.'
   end
 
 private

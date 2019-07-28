@@ -8,5 +8,6 @@ class CategoryJob
   def process
     puts "CategoryJob process: #{@url}, #{@jobs.size}"
     AppJob.bulk_create(app_links(links_on_page(fetch_page(@url))), @jobs, @processed_app_urls)
+    print 'c'
   end
 end

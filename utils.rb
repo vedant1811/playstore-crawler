@@ -11,7 +11,7 @@ def fetch_page(url)
   raise "unsuccessful response" unless response.success?
 
   Nokogiri::HTML(response.body)
-rescue HTTParty::Error, StandardError => e
+rescue HTTParty::Error => e
   if (retries += 1) < MAX_RETRIES
     puts "[#{url}]ignoring error: #{e}"
     sleep(rand)

@@ -3,7 +3,7 @@ class AppJob
     app_links
       .select { |e| !processed_app_urls.include?(e) }
       .map { |e| AppJob.new(e, jobs, processed_app_urls) }
-      .each { |e| jobs << e }
+      .each { |e| jobs << e unless jobs.closed? }
   end
 
   def initialize(url, jobs, processed_app_urls)
@@ -19,7 +19,7 @@ class AppJob
     links = links_on_page(html)
     AppJob.bulk_create(app_links(links), @jobs, @processed_app_urls)
 
-    app_name = html.css('h1.AHFaub').first.content
+    app_name = html.css('h1.AHFaub').first&.content
     installs = installs(html)
     dev_email = dev_email(links)
 
@@ -36,14 +36,14 @@ class AppJob
 private
   def dev_email(links)
     links.find { |e| e.start_with?('mailto') }
-        .split(':')
-        .last
+        &.split(':')
+        &.last
   end
 
   def installs(html)
     html.css('.BgcNfc')
         .find { |e| e.content == 'Installs' }
-        .next_sibling
-        .content
+        &.next_sibling
+        &.content
   end
 end

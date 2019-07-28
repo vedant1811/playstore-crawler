@@ -11,15 +11,20 @@ APP_URL_PREFIX = ROOT_URL + '/details?id='
 
 def process(jobs)
   5.times.map do |e|
-    puts "Thread #{e}"
     Thread.new(jobs) do |jobs_arg|
-      while !jobs_arg.empty?
-        jobs_arg.pop(true).process
+      begin
+        while !jobs_arg.closed? && !jobs_arg.empty?
+          jobs_arg.pop(true).process
+        end
+      rescue Interrupt
+        jobs_arg.close
+      rescue StandardError
+        print '-'
+        # ignore and end
       end
     end
   end
     .map(&:join)
-  puts
 end
 
 def main
@@ -30,11 +35,13 @@ def main
   processed_app_urls = Concurrent::Set.new
 
   categories.map { |e| CategoryJob.new(e, jobs, processed_app_urls) }
-    .each { |e| jobs << e }
+    .each { |e| jobs << e unless jobs.closed? }
 
   AppJob.bulk_create(apps, jobs, processed_app_urls)
 
   process(jobs)
+
+  puts
 end
 
 main

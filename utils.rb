@@ -6,8 +6,6 @@ MAX_RETRIES = 3
 
 # @return nokogiri HTML object
 def fetch_page(url)
-  return File.open("tmp/app.html") { |f| Nokogiri::HTML(f) }
-
   retries ||= 0
   response = HTTParty.get(url)
   raise "unsuccessful response" unless response.success?

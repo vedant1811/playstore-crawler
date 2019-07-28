@@ -6,6 +6,8 @@ MAX_RETRIES = 3
 
 # @return nokogiri HTML object
 def fetch_page(url)
+  return File.open("tmp/app.html") { |f| Nokogiri::HTML(f) }
+
   retries ||= 0
   response = HTTParty.get(url)
   raise "unsuccessful response" unless response.success?
@@ -21,10 +23,7 @@ rescue HTTParty::Error, StandardError => e
   end
 end
 
-def links_on_page(url)
-
-  html = File.open("tmp/app.html") { |f| Nokogiri::HTML(f) }
-  # puts html
+def links_on_page(html)
   html.css('a')
       .select { |e| e['href'] }
       .map do |a_tag|

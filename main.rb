@@ -4,6 +4,7 @@ require 'jobs/home_job'
 require 'jobs/category_job'
 require 'jobs/app_job'
 require 'utils'
+require 'concurrent'
 
 ROOT_URL = 'https://play.google.com/store/apps'
 APP_URL_PREFIX = ROOT_URL + '/details?id='
@@ -24,12 +25,14 @@ end
 def main
   home_job = HomeJob.new
   categories, apps = home_job.process
-  jobs = Queue.new
 
-  categories.map { |e| CategoryJob.new(e, jobs) }
+  jobs = Queue.new
+  processed_app_urls = Concurrent::Set.new
+
+  categories.map { |e| CategoryJob.new(e, jobs, processed_app_urls) }
     .each { |e| jobs << e }
 
-  AppJob.bulk_create(apps, jobs)
+  AppJob.bulk_create(apps, jobs, processed_app_urls)
 
   process(jobs)
 end

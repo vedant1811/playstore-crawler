@@ -4,10 +4,11 @@ require 'jobs/home_job'
 require 'utils'
 
 ROOT_URL = 'https://play.google.com/store/apps'
+APP_URL_PREFIX = ROOT_URL + '/details?id='
 
 def main
   home_job = HomeJob.new
-  home_job.process
+  categories, apps = home_job.process
 end
 
 main

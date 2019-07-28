@@ -1,5 +1,6 @@
 require 'httparty'
 require 'nokogiri'
+require 'cgi'
 
 MAX_RETRIES = 3
 
@@ -20,13 +21,28 @@ rescue HTTParty::Error, StandardError => e
   end
 end
 
-
 def links_on_page(url)
 
-  html = File.open("tmp/home.html") { |f| Nokogiri::HTML(f) }
-  html.css('a').map do |a_tag|
-    link = a_tag['href']
-    URI.join(ROOT_URL, link).to_s
-  end
+  html = File.open("tmp/app.html") { |f| Nokogiri::HTML(f) }
+  # puts html
+  html.css('a')
+      .select { |e| e['href'] }
+      .map do |a_tag|
+        link = a_tag['href']
+        # puts a_tag
+
+        # doesn't break mailto links
+        URI.join(ROOT_URL, link).to_s
+      end
       .uniq
+end
+
+def app_links(links)
+  links
+      .select { |e| e.start_with?(APP_URL_PREFIX) }
+      # .map do |url_string|
+      #   uri = URI.parse url_string
+      #   APP_URL_PREFIX + CGI.parse(uri.query)['id'].first
+      # end
+    # .uniq
 end
